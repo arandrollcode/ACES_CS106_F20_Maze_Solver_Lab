@@ -22,12 +22,12 @@ WHITE  = (255, 255, 255)
 
 class Cell:
     def __init__(self):
-        self.top_wall    = True
+        self.top_wall = True
         self.bottom_wall = True
-        self.left_wall   = True
-        self.right_wall  = True
+        self.left_wall = True
+        self.right_wall = True
         
-        self.visited     = False
+        self.visited = False
 
     def remove_wall(self, direction):
         if direction == UP:
@@ -42,6 +42,15 @@ class Cell:
     ## Does the opposite of remove_wall
     ## Add the wall in direction
     def add_wall(self, direction):
+        if direction == UP:
+            self.top_wall = True
+        elif direction == DOWN:
+            self.bottom_wall = True
+        elif direction == LEFT:
+            self.left_wall = True
+        elif direction == RIGHT:
+            self.right_wall = True
+
 
     ## Make a copy of Cell object
     def copy(self):
@@ -70,7 +79,14 @@ class Maze:
         self.screen = pygame.display.set_mode((pwidth, pheight))
         self.screen.fill(CYAN)
         pygame.display.set_caption("Maze Solver")
-        
+
+    def in_bounds(self, check_x, check_y):
+        if check_x < 0 or check_x >= self.width:
+            return False
+        if check_y < 0 or check_y >= self.height:
+            return False
+        return True
+
     def build_grid(self):
         s = self.tile_size
         b = self.border_width
@@ -135,6 +151,10 @@ class Maze:
         if self.animate == True:
             pygame.display.update()
 
+    def draw_goals(self):
+        self.draw_tile(0,0,PURPLE)
+        self.draw_tile(self.width-1,self.height-1,GREEN)
+
     def make_maze(self, start_x, start_y):
         self.build_grid()
         time.sleep(1.2)
@@ -165,12 +185,9 @@ class Maze:
                 newx = x + direction[0]
                 newy = y + direction[1]
 
-                if newx < 0 or newx >= self.width:
+                if not self.in_bounds(newx, newy):
                     continue
-
-                if newy < 0 or newy >= self.height:
-                    continue
-
+                
                 if cell_matrix[newx][newy].visited == False:
                     branches.append(direction)
 
@@ -194,11 +211,8 @@ class Maze:
                 self.draw_tile(x, y, RED)
                 clock.tick(fps)
                 self.draw_tile(x, y, WHITE)
-        def draw_ends():
-            self.draw_tile(0,0,PURPLE)
-            self.draw_tile(self.width-1,self.height-1,GREEN)
 
-        draw_ends()
+        self.draw_goals()
         pygame.display.update()
 
         self.maze = cell_matrix
@@ -209,7 +223,6 @@ class Maze:
         pygame.image.save(self.screen, filename)
 
     def solve_maze(self, start_coord, end_coord):
-        pass
         stack = list()
         clock = pygame.time.Clock()
         maze_info = [[self.maze[x][y].copy() for y in range(self.height)] for x in range(self.width)]
@@ -217,66 +230,67 @@ class Maze:
         fps = 0
 
         if self.animate == True:
-            fps = 1000
+            fps = 250
 
         x = start_coord[0]
-        ## TODO: Check if starting x coordinate is valid
-        
-        
         y = start_coord[1]
-        ## TODO: Check if starting x coordinate is valid
-        
+        ## TODO: Check if starting x  and y coordinates are valid
+        assert(self.in_bounds(x, y))
 
-        end_x = end_coord[0]
-        ## TODO: Check if ending x coordinate is valid
-        
-        
+        end_x = end_coord[0]        
         end_y = end_coord[1]
-        ## TODO: Check if ending y coordinate is valid
+        ## TODO: Check if ending x and y coordinates are valid
+        assert(self.in_bounds(end_x, end_y))
         
 
         ## Run until our current coordinate is equal to the ending coordinate
-        while not ____________:
+        while (x, y) != (end_x, end_y):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
 
             ## TODO: Draw a small red tile (use function draw_small_tile())
-            
+            self.draw_small_tile(x, y, RED)
                     
-            clock.fps(fps)
+            clock.tick(fps)
 
             branches = list()
 
             ## Checks if the top wall is present
-            ## If the top wall is not present, we can move up so we add it to branches
-            if maze_info[x][y].top_wall == False:
-                branches.append(UP)
-
+            ## If the top wall is not present, we can move up so we add it to branches            
             ## TODO: Check all other walls and add valid directions to branches
 
+            if maze_info[x][y].bottom_wall == False:
+                branches.append(DOWN)
+            if maze_info[x][y].right_wall == False:
+                branches.append(RIGHT)
+            if maze_info[x][y].top_wall == False:
+                branches.append(UP)
+            if maze_info[x][y].left_wall == False:
+                branches.append(LEFT)
             
             if len(branches) > 0:
                 ## TODO: Add our current coordinates to the stack
+                stack.append((x,y))
+                self.draw_small_tile(x, y, RED)
 
                 ## We just choose the first direction because randomness does not matter
                 direction = branches[0]
 
-                ## TODO: Seal off the wall in direction to help me remeber that I have been there before
-                
+                ## TODO: Seal off the wall in direction to help me remember that I have been there before
+                maze_info[x][y].add_wall(direction)
 
                 ## TODO: Update my X and y
-                
+                x += direction[0]
+                y += direction[1]
 
                 ## TODO: Seal off the wall in the opposite direction of my new position
                 ## The same as sealing off the wall to the cell that I came from
-                
-
-                
+                maze_info[x][y].add_wall(OPPOSITE[direction])
+                                
             else:
                 ## Draw a white tile over the small red_tile to 'erase' it from our screen
-
-                
+                self.draw_tile(x, y, WHITE)                
                 clock.tick(fps)
                 x, y = stack.pop()
 
@@ -287,11 +301,20 @@ if __name__ == "__main__":
     pygame.init()
 
     ## Try changing up the size and starting/ending locations for fun
-    maze = Maze(40, 42, 15, 2)
+    '''width, height, tile size, border width'''
+    maze = Maze(40, 35, 15, 2)
+
+    '''which coord to start making the maze'''
     maze.make_maze(maze.width//2,maze.height//2)
+
+    '''Save your maze as an image'''
     #m.save_maze()
-    m.solve_maze((0,0), (maze.width-1, maze.height-1))
-    #m.save_maze('Solved_Maze.jpg')
+
+    '''which coords are the start and end'''
+    maze.solve_maze((0,0), (maze.width-1, maze.height-1))
+
+    '''Save your maze as an image'''
+    maze.save_maze('Solved_Maze.jpg')
 
     run = True
     while run:
