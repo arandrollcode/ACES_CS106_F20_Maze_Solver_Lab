@@ -19,6 +19,7 @@ CYAN   = (0, 255, 255)
 PURPLE = (255, 0, 255)
 YELLOW = (255, 255, 0)
 WHITE  = (255, 255, 255)
+ORANGE = (255,165,0)
 
 class Cell:
     def __init__(self):
@@ -230,7 +231,7 @@ class Maze:
         fps = 0
 
         if self.animate == True:
-            fps = 250
+            fps = 200
 
         x = start_coord[0]
         y = start_coord[1]
@@ -312,7 +313,7 @@ if __name__ == "__main__":
     maze.solve_maze((0,0), (maze.width-1, maze.height-1))
 
     '''Save your maze as an image'''
-    maze.save_maze('Solved_Maze.jpg')
+    #maze.save_maze('Solved_Maze.jpg')
 
     run = True
     while run:
