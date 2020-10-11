@@ -51,7 +51,6 @@ class Cell:
         elif direction == RIGHT:
             self.right_wall = True
 
-
     ## Make a copy of Cell object
     def copy(self):
         new_cell = Cell()
@@ -64,12 +63,14 @@ class Cell:
         return new_cell
 
 class Maze:
-    def __init__(self, width=20, height=20, tile_size=20, border_width=20, animate=True):
+    def __init__(self, width=20, height=20, tile_size=20, border_width=20, color=WHITE, background=CYAN, solve=RED, animate=True):
         self.width = width
         self.height = height
         self.tile_size = tile_size
         self.border_width = border_width
         self.animate = animate
+        self.tile_color = color
+        self.solve_color = solve
 
         self.maze = [[Cell() for _ in range(self.height)] for _ in range(self.width)]
 
@@ -77,7 +78,7 @@ class Maze:
         pheight = (height * tile_size) + (2 * border_width)
         
         self.screen = pygame.display.set_mode((pwidth, pheight))
-        self.screen.fill(CYAN)
+        self.screen.fill(background)
         pygame.display.set_caption("Maze Solver")
 
     def in_bounds(self, check_x, check_y):
@@ -110,7 +111,6 @@ class Maze:
     def push(self, x, y, direction):
         s = self.tile_size
         b = self.border_width
-
         
         px = (x * s) + b + 1
         py = (y * s) + b + 1
@@ -120,9 +120,9 @@ class Maze:
             py += direction[1] * s
 
         if direction in (UP, DOWN):
-            pygame.draw.rect(self.screen, WHITE, (px, py, s - 1, (2 * s) - 1), 0)
+            pygame.draw.rect(self.screen, self.tile_color, (px, py, s - 1, (2 * s) - 1), 0)
         else:
-            pygame.draw.rect(self.screen, WHITE, (px, py, (2 * s) - 1, s - 1), 0)
+            pygame.draw.rect(self.screen, self.tile_color, (px, py, (2 * s) - 1, s - 1), 0)
 
         if self.animate == True:
             pygame.display.update()
@@ -210,7 +210,7 @@ class Maze:
                 x, y = stack.pop()
                 self.draw_tile(x, y, RED)
                 clock.tick(fps)
-                self.draw_tile(x, y, WHITE)
+                self.draw_tile(x, y, self.tile_color)
 
         self.draw_goals()
         pygame.display.update()
@@ -240,8 +240,7 @@ class Maze:
         end_x = end_coord[0]        
         end_y = end_coord[1]
         ## TODO: Check if ending x and y coordinates are valid
-        assert(self.in_bounds(end_x, end_y))
-        
+        assert(self.in_bounds(end_x, end_y))        
 
         ## Run until our current coordinate is equal to the ending coordinate
         while (x, y) != (end_x, end_y):
@@ -250,7 +249,7 @@ class Maze:
                     pygame.quit()
 
             ## TODO: Draw a small red tile (use function draw_small_tile())
-            self.draw_small_tile(x, y, RED)
+            self.draw_small_tile(x, y, self.solve_color)
                     
             clock.tick(fps)
 
@@ -272,7 +271,7 @@ class Maze:
             if len(branches) > 0:
                 ## TODO: Add our current coordinates to the stack
                 stack.append((x,y))
-                self.draw_small_tile(x, y, RED)
+                self.draw_small_tile(x, y, self.solve_color)
 
                 ## We just choose the first direction because randomness does not matter
                 direction = branches[0]
@@ -289,19 +288,18 @@ class Maze:
                 maze_info[x][y].add_wall(OPPOSITE[direction])
                                 
             else:
-                ## Draw a white tile over the small red_tile to 'erase' it from our screen
-                self.draw_tile(x, y, WHITE)                
+                ## Draw a self.tile_color tile over the small red_tile to 'erase' it from our screen
+                self.draw_tile(x, y, self.tile_color)                
                 clock.tick(fps)
                 x, y = stack.pop()
 
-
-        self.draw_small_tile(x, y, RED)
+        self.draw_small_tile(x, y, self.solve_color)
                 
 if __name__ == "__main__":
     pygame.init()
 
     ## Try changing up the size and starting/ending locations for fun
-    '''width, height, tile size, border width'''
+    '''width, height, tile_size, border_width, animate, tile color, background color, solve-thingies color'''
     maze = Maze(40, 35, 15, 2)
 
     '''which coord to start making the maze'''
