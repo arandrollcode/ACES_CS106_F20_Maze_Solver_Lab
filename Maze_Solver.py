@@ -31,18 +31,17 @@ class Cell:
 
     def remove_wall(self, direction):
         if direction == UP:
-            self.top_wall    = False
+            self.top_wall = False
         elif direction == DOWN:
             self.bottom_wall = False
         elif direction == LEFT:
-            self.left_wall   = False
+            self.left_wall = False
         elif direction == RIGHT:
-            self.right_wall  = False
+            self.right_wall = False
 
     ## Does the opposite of remove_wall
     ## Add the wall in direction
     def add_wall(self, direction):
-        ## TODO
 
     ## Make a copy of Cell object
     def copy(self):
@@ -57,20 +56,20 @@ class Cell:
 
 class Maze:
     def __init__(self, width=20, height=20, tile_size=20, border_width=20, animate=True):
-        self.width        = width
-        self.height       = height
-        self.tile_size    = tile_size
+        self.width = width
+        self.height = height
+        self.tile_size = tile_size
         self.border_width = border_width
-        self.animate      = animate
+        self.animate = animate
 
-        self.maze         = [[Cell() for _ in range(self.height)] for _ in range(self.width)]
+        self.maze = [[Cell() for _ in range(self.height)] for _ in range(self.width)]
 
         pwidth = (width * tile_size) + (2 * border_width)
         pheight = (height * tile_size) + (2 * border_width)
         
         self.screen = pygame.display.set_mode((pwidth, pheight))
         self.screen.fill(CYAN)
-        pygame.display.set_caption("Python Maze Generator")
+        pygame.display.set_caption("Maze Solver")
         
     def build_grid(self):
         s = self.tile_size
@@ -138,13 +137,13 @@ class Maze:
 
     def make_maze(self, start_x, start_y):
         self.build_grid()
-        time.sleep(5)
+        time.sleep(1.2)
         clock = pygame.time.Clock()
 
-        tick = 0
+        fps = 0
 
         if self.animate == True:
-            tick = 20
+            fps = 1000
         
         x = start_x
         y = start_y
@@ -159,7 +158,7 @@ class Maze:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     
-            clock.tick(tick)
+            clock.tick(fps)
             branches = list()
             
             for direction in (UP, DOWN, LEFT, RIGHT):
@@ -193,26 +192,32 @@ class Maze:
             else:
                 x, y = stack.pop()
                 self.draw_tile(x, y, RED)
-                clock.tick(tick)
+                clock.tick(fps)
                 self.draw_tile(x, y, WHITE)
+        def draw_ends():
+            self.draw_tile(0,0,PURPLE)
+            self.draw_tile(self.width-1,self.height-1,GREEN)
 
+        draw_ends()
         pygame.display.update()
 
         self.maze = cell_matrix
 
     ## Save an image of the maze
+
     def save_maze(self, filename='maze.jpg'):
         pygame.image.save(self.screen, filename)
 
     def solve_maze(self, start_coord, end_coord):
+        pass
         stack = list()
         clock = pygame.time.Clock()
         maze_info = [[self.maze[x][y].copy() for y in range(self.height)] for x in range(self.width)]
 
-        tick = 0
+        fps = 0
 
         if self.animate == True:
-            tick = 20
+            fps = 1000
 
         x = start_coord[0]
         ## TODO: Check if starting x coordinate is valid
@@ -239,7 +244,7 @@ class Maze:
             ## TODO: Draw a small red tile (use function draw_small_tile())
             
                     
-            clock.tick(tick)
+            clock.fps(fps)
 
             branches = list()
 
@@ -272,7 +277,7 @@ class Maze:
                 ## Draw a white tile over the small red_tile to 'erase' it from our screen
 
                 
-                clock.tick(tick)
+                clock.tick(fps)
                 x, y = stack.pop()
 
 
@@ -282,11 +287,11 @@ if __name__ == "__main__":
     pygame.init()
 
     ## Try changing up the size and starting/ending locations for fun
-    m = Maze(10,10, animate=True)
-    m.make_maze(0, 0)
-    m.save_maze()
-    m.solve_maze((0,0), (m.width-1, m.height-1))
-    m.save_maze('solved_maze.jpg')
+    maze = Maze(40, 42, 15, 2)
+    maze.make_maze(maze.width//2,maze.height//2)
+    #m.save_maze()
+    m.solve_maze((0,0), (maze.width-1, maze.height-1))
+    #m.save_maze('Solved_Maze.jpg')
 
     run = True
     while run:
