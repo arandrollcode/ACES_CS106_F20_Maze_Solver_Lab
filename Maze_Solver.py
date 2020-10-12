@@ -163,9 +163,6 @@ class Maze:
 
         fps = 0
 
-        if self.animate == True:
-            fps = 1000
-        
         x = start_x
         y = start_y
         stack = list()
@@ -219,8 +216,7 @@ class Maze:
         self.maze = cell_matrix
 
     ## Save an image of the maze
-
-    def save_maze(self, filename='maze.jpg'):
+    def save_maze(self, filename='Solved_Maze.jpg'):
         pygame.image.save(self.screen, filename)
 
     def solve_maze(self, start_coord, end_coord):
@@ -305,9 +301,6 @@ if __name__ == "__main__":
 
     '''which coord to start making the maze'''
     maze.make_maze(maze.width//2,maze.height//2)
-
-    '''Save your maze as an image'''
-    #m.save_maze()
 
     '''which coords are the start and end'''
     maze.solve_maze((0,0), (maze.width-1, maze.height-1))
