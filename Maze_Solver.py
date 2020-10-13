@@ -256,10 +256,10 @@ class Maze:
             ## If the top wall is not present, we can move up so we add it to branches            
             ## TODO: Check all other walls and add valid directions to branches
 
-            if maze_info[x][y].bottom_wall == False:
-                branches.append(DOWN)
             if maze_info[x][y].right_wall == False:
                 branches.append(RIGHT)
+            if maze_info[x][y].bottom_wall == False:
+                branches.append(DOWN)
             if maze_info[x][y].top_wall == False:
                 branches.append(UP)
             if maze_info[x][y].left_wall == False:
