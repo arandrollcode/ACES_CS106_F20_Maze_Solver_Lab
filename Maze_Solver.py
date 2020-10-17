@@ -272,7 +272,6 @@ class Maze:
             if len(branches) > 0:
                 ## TODO: Add our current coordinates to the stack
                 stack.append((x,y))
-                self.draw_small_tile(x, y, self.solve_color)
 
                 ## We just choose the first direction because randomness does not matter
                 direction = branches[0]
