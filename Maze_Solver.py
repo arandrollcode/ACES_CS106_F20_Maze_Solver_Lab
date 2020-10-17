@@ -152,9 +152,9 @@ class Maze:
         if self.animate == True:
             pygame.display.update()
 
-    def draw_goals(self):
-        self.draw_tile(0,0,PURPLE)
-        self.draw_tile(self.width-1,self.height-1,GREEN)
+    def draw_goals(self, start, end):
+        self.draw_tile(start[0] ,start[1], PURPLE)
+        self.draw_tile(end[0], end[1], GREEN)
 
     def make_maze(self, start_x, start_y):
         self.build_grid()
@@ -209,8 +209,6 @@ class Maze:
                 self.draw_tile(x, y, RED)
                 clock.tick(fps)
                 self.draw_tile(x, y, self.tile_color)
-
-        self.draw_goals()
         pygame.display.update()
 
         self.maze = cell_matrix
@@ -232,12 +230,18 @@ class Maze:
         x = start_coord[0]
         y = start_coord[1]
         ## TODO: Check if starting x  and y coordinates are valid
-        assert(self.in_bounds(x, y))
+        if not self.in_bounds(x, y):
+            x=0
+            y=0
 
         end_x = end_coord[0]        
         end_y = end_coord[1]
         ## TODO: Check if ending x and y coordinates are valid
-        assert(self.in_bounds(end_x, end_y))        
+        if not self.in_bounds(end_x, end_y):
+            end_x=self.width-1
+            end_y=self.height-1
+
+        self.draw_goals((x,y),(end_x,end_y))
 
         ## Run until our current coordinate is equal to the ending coordinate
         while (x, y) != (end_x, end_y):
